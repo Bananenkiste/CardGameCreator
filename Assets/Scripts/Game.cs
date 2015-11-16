@@ -7,19 +7,22 @@ using System.Collections.Generic;
 
 public class Game : MonoBehaviour 
 {
-    public Player player;
     private static Game instance = null;
     public static Game Instance
     {
         get { return instance; }
     }
 
-    public GUISetManager setManager;
-    private List<NetPlayer> players = new List<NetPlayer>();
     private Dictionary<Card, int> set = new Dictionary<Card, int>();
+    
+    private List<Player> players = new List<Player>();
     private int activePlayer = 0;
 
+    #region Initialization
 
+    /// <summary>
+    /// Makes sure there is only one Game instance in the scene
+    /// </summary>
     void Awake()
     {
         if (instance != null)
@@ -29,41 +32,113 @@ public class Game : MonoBehaviour
         instance = this;
     }
 
-    public void OnPlayerConnected(NetworkPlayer pl)
+    /// <summary>
+    /// Whenever a player connects a new instance of player is created and will be added to the existing list of players
+    /// </summary>
+    /// <param name="netInfo">the socket/connection to the player</param>
+    public void OnPlayerConnected(NetworkPlayer netInfo)
     {
-        players.Add(new NetPlayer(pl, null));
+        players.Add(new Player(netInfo));
     }
 
-
+    /// <summary>
+    /// The server owner gets added to the list of players
+    /// </summary>
     public void OnServerInitialized()
     {
-        players.Add(new NetPlayer(Network.player,player,true));
+        players.Add(new Player(networkView.owner));
     }
 
+    
+
+    
+    #endregion
+
+    #region ServerManagement
+
     public void ServerStart()
-    { 
+    {
         //create Deck and send it to other players
         MemoryStream mem = new MemoryStream();
         BinaryFormatter b = new BinaryFormatter();
         b.Serialize(mem, Library.GetHandCards().ToArray());
 
-        networkView.RPC("SetHandCards",RPCMode.AllBuffered, System.Convert.ToBase64String(mem.GetBuffer()));
+        networkView.RPC("SetHandCards", RPCMode.AllBuffered, System.Convert.ToBase64String(mem.GetBuffer()));
         mem.Close();
 
         set = Library.TestDeck();
         MemoryStream mem2 = new MemoryStream();
-        b.Serialize(mem2,set);
+        b.Serialize(mem2, set);
 
         networkView.RPC("SetDeck", RPCMode.AllBuffered, mem2.GetBuffer());
         networkView.RPC("StartGame", RPCMode.AllBuffered, null);
 
-
         activePlayer = Random.Range(0, players.Count - 1);
-        NextPlayer();
-
+        
+        //NextPlayer();
     }
 
-    
+   
+
+    void NextPlayer()
+    {
+        activePlayer++;
+        if (activePlayer >= players.Count)
+        {
+            activePlayer = 0;
+        }
+        Debug.Log("new player: " + activePlayer);
+        if (!CheckEnd())
+        {
+            networkView.RPC("Annotation", RPCMode.AllBuffered, "Next Player is: " + players[activePlayer].Name);
+            //StartTurn(activePlayer);
+        }
+        else
+        {
+            networkView.RPC("EndGame", RPCMode.AllBuffered, null);
+        }
+    }
+
+
+    bool CheckEnd()
+    {
+        //return (setManager.CheckEnd());
+        return false;
+    }
+    #endregion
+
+    #region RPC
+
+
+    [RPC]
+    private void GetPlayerInfo(NetworkPlayer player)
+    {
+        networkView.RPC("SetPlayerInfo", RPCMode.Server, player, Settings.playerName);
+    }
+
+    [RPC]
+    private void SetPlayerInfo(NetworkPlayer player, string name)
+    {
+        foreach (Player p in players)
+        {
+            if (p.NetInfo == player)
+            {
+                p.Name = name;
+            }
+        }
+    }
+
+    [RPC]
+    private void Annotation(string info)
+    {
+        Debug.Log("Annotation: "+info);
+    }
+
+    #endregion
+
+
+    /*
+       
     public void PlayCard(Card c)
     {
         MemoryStream mem = new MemoryStream();
@@ -196,23 +271,7 @@ public class Game : MonoBehaviour
         }      
     }
 
-    void NextPlayer()
-    {
-        activePlayer++;
-        if (activePlayer >= players.Count)
-        { 
-            activePlayer = 0;
-        }
-        Debug.Log("new player: " + activePlayer);
-        if (!CheckEnd())
-        {
-            StartTurn(activePlayer);
-        }
-        else
-        {
-            networkView.RPC("EndGame", RPCMode.AllBuffered, null);
-        }
-    }
+    
 
     public void EndMyTurn()
     {
@@ -236,11 +295,7 @@ public class Game : MonoBehaviour
         }
     }
 
-    bool CheckEnd()
-    {
-        //return (setManager.CheckEnd());
-        return false;
-    }
+    
 
     [RPC]
     void EndGame()
@@ -345,6 +400,8 @@ public class Game : MonoBehaviour
 
         setManager.BuyCard(card);
     }
+     * 
+     */
 }
 
 

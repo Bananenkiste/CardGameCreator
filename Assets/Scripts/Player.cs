@@ -2,15 +2,34 @@
 using System.Collections;
 using System.Collections.Generic;
 
+
 public class Player
 {
     private string name = "Unnamed";
+    public string Name 
+    { 
+        get { return name; }
+        set { name = value; }
+    }
     private List<Found> resources = new List<Found>();
     private List<Card> deck = new List<Card>();
     private List<Card> graveyard = new List<Card>();
     private List<Card> active = new List<Card>();
     private List<Card> hand = new List<Card>();
     private bool turnActive = false;
+    private NetworkPlayer netInfo;
+
+    public NetworkPlayer NetInfo { get { return netInfo; } }
+
+    public Player()
+    {
+
+    }
+
+    public Player(NetworkPlayer data)
+    {
+        netInfo = data;
+    }
 
 
     public void StartTurn()
@@ -237,7 +256,7 @@ public class Player
             graveyard.AddRange(hand);
             hand.Clear();
             resources.Clear();
-            Game.Instance.EndMyTurn();
+            //Game.Instance.EndMyTurn();
             DrawCard(5);
         }
         

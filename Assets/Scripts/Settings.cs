@@ -11,7 +11,13 @@ public static class Settings
     private static float sVolume = 0.0f;
     private static Resolution screenResolution = Screen.currentResolution;
     private static bool screenMode = true;
+    private static string playername = "Unnamed";
 
+    public static string playerName
+    {
+        get { return playername; }
+        set { playername = value; }
+    }
 
     public static float musicVolume
     {

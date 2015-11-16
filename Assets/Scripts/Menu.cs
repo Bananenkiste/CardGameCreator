@@ -10,6 +10,8 @@ public class Menu : MonoBehaviour
 
     public Window ServerMenu;
     public Window Lobby;
+    public Window Settings;
+
     public Text message;
 
     public void OpenServerMenu()
@@ -98,9 +100,19 @@ public class Menu : MonoBehaviour
 
     public void StartGame()
     {
-        Game.Instance.ServerStart();
+        //Game.Instance.ServerStart();
     }
 
+    public void OpenSettings()
+    {
+        CloseServerList();
+        CloseServerMenu();
+        Settings.Enable();
+    }
 
+    public void CloseSettings()
+    {
+        Settings.Disable();
+    }
 
 }
