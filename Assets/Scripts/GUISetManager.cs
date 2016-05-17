@@ -13,7 +13,6 @@ public class GUISetManager : MonoBehaviour
         deck.Clear();
         deck = set;
 
-
         List<Card> cards = new List<Card>(set.Keys);
         for (int i = 0; i < cards.Count; ++i)
         { 
@@ -24,9 +23,6 @@ public class GUISetManager : MonoBehaviour
         }
         startCount = deck.Count;
     }
-
-
-    
 
     public bool BuyCard(Card c)
     {

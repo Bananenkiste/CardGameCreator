@@ -18,7 +18,7 @@ public class Chat : MonoBehaviour
         Destroy(this.gameObject);    
     }
 
-
+/*
     [RPC]
     public void RecieveMessage(string message)
     {
@@ -35,13 +35,13 @@ public class Chat : MonoBehaviour
         Debug.Log("Outgoing Message");
         if (Network.isServer)
         {
-            networkView.RPC("RecieveMessage", RPCMode.All, message);
+            GetComponent<NetworkView>().RPC("RecieveMessage", RPCMode.All, message);
         }
         else
         {
-            networkView.RPC("SendChatMessage", RPCMode.Server, message);
+            GetComponent<NetworkView>().RPC("SendChatMessage", RPCMode.Server, message);
         }
     
     }
-	
+	*/
 }

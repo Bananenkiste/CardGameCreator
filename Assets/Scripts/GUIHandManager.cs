@@ -51,7 +51,6 @@ public class GUIHandManager : MonoBehaviour
         {
             Destroy(cards[i].gameObject);
         }
-        //Reposition();
         cards.Clear();
     }
 

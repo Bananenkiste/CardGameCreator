@@ -11,6 +11,9 @@ public class Player
         get { return name; }
         set { name = value; }
     }
+
+
+    private GUIHandManager handManager;
     private List<Found> resources = new List<Found>();
     private List<Card> deck = new List<Card>();
     private List<Card> graveyard = new List<Card>();
@@ -23,22 +26,26 @@ public class Player
 
     public Player()
     {
-
+        handManager = Object.FindObjectOfType<GUIHandManager>();
+        if (handManager == null)
+        { Debug.LogError("No HandManager Found!"); }
     }
 
     public Player(NetworkPlayer data)
     {
         netInfo = data;
+        handManager = Object.FindObjectOfType<GUIHandManager>();
+        if (handManager == null)
+        { Debug.LogError("No HandManager Found!"); }
     }
 
 
     public void StartTurn()
     {
-        Debug.Log("Start!");
         turnActive = true;
         for (int i = 0; i < active.Count; ++i)
         {
-            PlayCard(null,active[i]);
+            PlayCard(active[i]);
         }
         graveyard.AddRange(active);
         active.Clear();
@@ -129,16 +136,13 @@ public class Player
 
     public void PlayHandCard(Card c)
     {
-        PlayCard(null, c);
+        PlayCard(c);
+        RemoveCard(c);
+        graveyard.Add(c);
     }
 
-    public void PlayCard(List<Card>source, Card c)
+    public void PlayCard(Card c)
     {
-        
-        if (source != null)
-        {
-            source.Remove(c);
-        }
         for (int i = 0; i < c.action.Count; ++i)
         {
             if (c.action[i].target == PlayerTarget.self)
@@ -176,27 +180,6 @@ public class Player
         }
     }
 
-    /*public void DoServerAction(Action action)
-    {
-        switch (action.type)
-        {
-            case ActionType.AddBuy:
-                {
-                    AddFounds(FoundsType.Buy, action.value);
-                    break;
-                }
-            case ActionType.AddAction:
-                {
-                    AddFounds(FoundsType.Action, action.value);
-                    break;
-                }
-            case ActionType.AddGold:
-                {
-                    AddFounds(FoundsType.Gold, action.value);
-                    break;
-                }
-        }
-    }*/
 
     public void AddCard(Card c)
     {
@@ -210,6 +193,7 @@ public class Player
             RemoveFounds(c.produce[i].type, c.produce[i].value);
         }
         hand.Remove(c);
+        handManager.RemoveCard(c);
         graveyard.Add(c);
     }
 
@@ -220,6 +204,7 @@ public class Player
             RemoveFounds(c.produce[i].type, c.produce[i].value);
         }
         hand.Remove(c);
+        handManager.RemoveCard(c);
     }
 
 
@@ -279,9 +264,17 @@ public class Player
     {
         if (deck.Count < 1)
         {
-            Shuffle();
+            if (graveyard.Count >= 1)
+            {
+                Shuffle();
+            }
+            else
+            {
+                return;
+            }
         }
         hand.Add(deck[0]);
+        handManager.AddCard(deck[0]);
         for (int i = 0; i < deck[0].produce.Count; ++i)
         {
             //if (deck[0].produce[i].type != FoundsType.Point && deck[0].produce[i].type != FoundsType.None)

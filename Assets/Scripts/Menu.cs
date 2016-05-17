@@ -94,7 +94,7 @@ public class Menu : MonoBehaviour
 
     public void SendChat()
     {
-        Chat.instance.SendChatMessage(message.text);
+        //Chat.instance.SendChatMessage(message.text);
         message.text = string.Empty;
     }
 

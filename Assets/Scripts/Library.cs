@@ -24,9 +24,13 @@ public static class Library
 
     public static List<Card> GetHandCards()
     {
-        cards = Load();
+        if (cards == null)
+        {
+            cards = Load();
+        }
+
         List<Card> hand = new List<Card>();
-        Card c = GetCardByName("Anwesen");
+        Card c = GetCardByName("Dorf");
         if (c != null)
         {
             for (int i = 0; i < 3; ++i)
@@ -61,6 +65,10 @@ public static class Library
 
     public static Dictionary<Card,int> TestDeck()
     {
+        if (cards == null)
+        {
+            cards = Load();
+        }
         Dictionary<Card, int> deck = new Dictionary<Card,int>();
 
         deck.Add(GetCardByName("Anwesen"), 12);
@@ -73,6 +81,7 @@ public static class Library
         deck.Add(GetCardByName("Burggraben"),10);
         deck.Add(GetCardByName("Laboratorium"),10);
         deck.Add(GetCardByName("Markt"),10);
+        deck.Add(GetCardByName("Kapelle"), 10);
 
         return deck;
     }

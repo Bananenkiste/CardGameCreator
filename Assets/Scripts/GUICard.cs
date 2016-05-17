@@ -30,7 +30,7 @@ public class GUICard : MonoBehaviour
 
     public void PlayCard()
     {
-        //Game.Instance.PlayCard(card);
+        Game.Instance.PlayCard(card);
     }
 
     public void BuyCard()

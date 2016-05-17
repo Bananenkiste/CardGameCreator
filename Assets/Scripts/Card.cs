@@ -64,9 +64,19 @@ public class Card
         
         for (int i = 0; i < produce.Count; ++i)
         {
-            info += produce[i].Info();
+            info += string.Format("{0}"+'\n',produce[i].Info());
         }
-
+        if (action != null && action.Count > 0)
+        {
+            if (produce != null && produce.Count > 0)
+            {
+                info += string.Format("================" + '\n');
+            }
+            for (int i = 0; i < action.Count; ++i)
+            {
+                info += string.Format("{0}" + '\n', action[i].Info());
+            }
+        }
         return info;
     }
 
@@ -78,14 +88,13 @@ public class Action
     public PlayerTarget target;
     public ActionType type;
     public int value;
-    public List<Action> choosableActions;
+    //public List<Action> choosableActions;
 
     public string Info()
     {
         string info = string.Empty;
 
         info += "+ " + value.ToString() + " " + type.ToString();
-
 
         return info;
     }
